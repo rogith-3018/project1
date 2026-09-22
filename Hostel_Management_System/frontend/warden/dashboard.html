@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hostel Management System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #243447;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+nav {
+    background: #34495e;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+nav button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+nav button:hover {
+    background: #2980b9;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card h2 {
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+.form-box {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+input, select {
+    width: 100%;
+    padding: 11px;
+    margin: 8px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #219150;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #34495e;
+    color: white;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+@media(max-width: 600px) {
+    table {
+        font-size: 12px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Hostel Management System</h1>
+    <p>Student & Room Management</p>
+</header>
+
+<nav>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('students')">Students</button>
+    <button onclick="showSection('rooms')">Rooms</button>
+    <button onclick="showSection('fees')">Fees</button>
+</nav>
+
+<div class="container">
+
+<!-- Dashboard -->
+<section id="dashboard" class="section active">
+    <h2>Dashboard</h2>
+
+    <div class="dashboard">
+        <div class="card">
+            <h2 id="studentCount">0</h2>
+            <p>Total Students</p>
+        </div>
+
+        <div class="card">
+            <h2 id="roomCount">20</h2>
+            <p>Total Rooms</p>
+        </div>
+
+        <div class="card">
+            <h2 id="occupiedCount">0</h2>
+            <p>Occupied Rooms</p>
+        </div>
+
+        <div class="card">
+            <h2 id="availableCount">20</h2>
+            <p>Available Rooms</p>
+        </div>
+    </div>
+</section>
+
+<!-- Students -->
+<section id="students" class="section">
+    <h2>Student Management</h2>
+
+    <div class="form-box">
+        <h3>Add Student</h3>
+
+        <form id="studentForm">
+            <input type="text" id="studentName"
+                   placeholder="Student Name" required>
+
+            <input type="text" id="studentId"
+                   placeholder="Student ID" required>
+
+            <input type="text" id="course"
+                   placeholder="Course" required>
+
+            <select id="roomNumber" required>
+                <option value="">Select Room</option>
+            </select>
+
+            <input type="text" id="phone"
+                   placeholder="Phone Number" required>
+
+            <button class="submit-btn" type="submit">
+                Add Student
+            </button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Course</th>
+                <th>Room</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="studentTable"></tbody>
+    </table>
+</section>
+
+<!-- Rooms -->
+<section id="rooms" class="section">
+    <h2>Room Management</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Capacity</th>
+                <th>Occupied</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody id="roomTable"></tbody>
+    </table>
+</section>
+
+<!-- Fees -->
+<section id="fees" class="section">
+    <h2>Fee Management</h2>
+
+    <div class="form-box">
+        <form id="feeForm">
+            <input type="text" id="feeStudent"
+                   placeholder="Student Name" required>
+
+            <input type="number" id="feeAmount"
+                   placeholder="Amount" required>
+
+            <select id="feeStatus">
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+            </select>
+
+            <button class="submit-btn" type="submit">
+                Add Fee
+            </button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody id="feeTable"></tbody>
+    </table>
+</section>
+
+</div>
+
+<script>
+
+let students = JSON.parse(localStorage.getItem("students")) || [];
+let fees = JSON.parse(localStorage.getItem("fees")) || [];
+
+const totalRooms = 20;
+
+function showSection(sectionId) {
+
+    document.querySelectorAll(".section")
+        .forEach(section => section.classList.remove("active"));
+
+    document.getElementById(sectionId)
+        .classList.add("active");
+}
+
+function saveData() {
+    localStorage.setItem("students", JSON.stringify(students));
+    localStorage.setItem("fees", JSON.stringify(fees));
+}
+
+function updateDashboard() {
+
+    document.getElementById("studentCount").innerText =
+        students.length;
+
+    const occupiedRooms = new Set(
+        students.map(student => student.room)
+    ).size;
+
+    document.getElementById("occupiedCount").innerText =
+        occupiedRooms;
+
+    document.getElementById("availableCount").innerText =
+        totalRooms - occupiedRooms;
+}
+
+function loadRoomOptions() {
+
+    const select = document.getElementById("roomNumber");
+
+    select.innerHTML =
+        '<option value="">Select Room</option>';
+
+    for (let i = 1; i <= totalRooms; i++) {
+
+        let room = "R-" + i;
+
+        let occupied = students.some(
+            student => student.room === room
+        );
+
+        if (!occupied) {
+            select.innerHTML +=
+                `<option value="${room}">${room}</option>`;
+        }
+    }
+}
+
+function displayStudents() {
+
+    const table = document.getElementById("studentTable");
+
+    table.innerHTML = "";
+
+    students.forEach((student, index) => {
+
+        table.innerHTML += `
+        <tr>
+            <td>${student.name}</td>
+            <td>${student.id}</td>
+            <td>${student.course}</td>
+            <td>${student.room}</td>
+            <td>${student.phone}</td>
+            <td>
+                <button class="delete-btn"
+                    onclick="deleteStudent(${index})">
+                    Delete
+                </button>
+            </td>
+        </tr>`;
+    });
+}
+
+function deleteStudent(index) {
+
+    students.splice(index, 1);
+
+    saveData();
+    displayStudents();
+    loadRoomOptions();
+    displayRooms();
+    updateDashboard();
+}
+
+function displayRooms() {
+
+    const table = document.getElementById("roomTable");
+
+    table.innerHTML = "";
+
+    for (let i = 1; i <= totalRooms; i++) {
+
+        const room = "R-" + i;
+
+        const occupied = students.filter(
+            student => student.room === room
+        ).length;
+
+        const status =
+            occupied > 0 ? "Occupied" : "Available";
+
+        table.innerHTML += `
+        <tr>
+            <td>${room}</td>
+            <td>1</td>
+            <td>${occupied}</td>
+            <td>${status}</td>
+        </tr>`;
+    }
+}
+
+document.getElementById("studentForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const student = {
+
+        name: document.getElementById("studentName").value,
+
+        id: document.getElementById("studentId").value,
+
+        course: document.getElementById("course").value,
+
+        room: document.getElementById("roomNumber").value,
+
+        phone: document.getElementById("phone").value
+    };
+
+    students.push(student);
+
+    saveData();
+
+    this.reset();
+
+    displayStudents();
+    loadRoomOptions();
+    displayRooms();
+    updateDashboard();
+
+    alert("Student added successfully!");
+});
+
+document.getElementById("feeForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const fee = {
+
+        student:
+            document.getElementById("feeStudent").value,
+
+        amount:
+            document.getElementById("feeAmount").value,
+
+        status:
+            document.getElementById("feeStatus").value
+    };
+
+    fees.push(fee);
+
+    saveData();
+
+    displayFees();
+
+    this.reset();
+
+    alert("Fee record added!");
+});
+
+function displayFees() {
+
+    const table = document.getElementById("feeTable");
+
+    table.innerHTML = "";
+
+    fees.forEach(fee => {
+
+        table.innerHTML += `
+        <tr>
+            <td>${fee.student}</td>
+            <td>₹${fee.amount}</td>
+            <td>${fee.status}</td>
+        </tr>`;
+    });
+}
+
+// Initial loading
+loadRoomOptions();
+displayStudents();
+displayRooms();
+displayFees();
+updateDashboard();
+
+</script>
+
+</body>
+</html>
